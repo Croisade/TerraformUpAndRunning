@@ -11,6 +11,7 @@ resource "aws_db_instance" "example" {
 	username = "admin"
 
 	password = "changeme123"
+	skip_final_snapshot = true
 }
 #data "aws_secretsmanager_secret_version" "db_password" {
 #	secret_id = "rds-password"
