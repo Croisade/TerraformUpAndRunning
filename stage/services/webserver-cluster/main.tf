@@ -5,12 +5,8 @@ resource "aws_launch_configuration" "example" {
 	image_id	=	"ami-0c55b159cbfafe1f0"
 	instance_type	=	"t2.micro"
   security_groups = [aws_security_group.instance.id]
+	user_data = data.template_file.user_data.rendered
 
-	user_data = <<-EOF
-							#!/bin/bash
-							echo "Hello, World" > index.html
-							nohup busybox httpd -f -p ${var.server_port} &
-							EOF
   lifecycle{
 		create_before_destroy = true
 	}
@@ -118,15 +114,31 @@ resource "aws_lb_listener_rule" "asg" {
 terraform {
 	backend "s3" {
 		bucket = "up-and-running-tloj-golden"
-		key = "global/s3/terraform.tfstate"
+		key = "services/webserver-cluster/terraform.tfstate"
 		region = "us-east-2"
 
 		dynamodb_table = "terraform-up-and-running-locks"
 		encrypt = true
 	}
 }
+data "terraform_remote_state" "db" {
+	backend = "s3"
 
+	config = {
+		bucket = "up-and-running-tloj-golden" 
+		key = "env:/stage/data-stores/mysql/terraform.tfstate"
+		region = "us-east-2"
+	}
+}
+data "template_file" "user_data" {
+	template = file("user-data.sh")
 
+	vars = {
+		server_port = var.server_port
+		db_address = data.terraform_remote_state.db.outputs.address
+	  db_port = data.terraform_remote_state.db.outputs.port
+	}
+}
 
 
 
