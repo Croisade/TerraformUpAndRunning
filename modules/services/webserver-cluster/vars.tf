@@ -23,7 +23,7 @@ variable "min_size" {
 	description = "The minimum number of EC2 instances in the ASG"
 	type = number
 }
-variable max_Size {
+variable "max_size" {
 	description = "The minimum number of EC2 instances in the ASG"
 	type = number
 }
