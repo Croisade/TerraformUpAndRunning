@@ -3,8 +3,8 @@ provider "aws" {
 }
 
 module "webserver-cluster" {
-	source = "../../../modules/services/webserver-cluster"
-
+	source = "github.com/Croisade/TerraformUpAndRunning//modules/services/webserver-cluster?ref=v0.0.3"
+	
 	cluster_name = "webservers-stage"
 	db_remote_state_bucket = "up-and-running-tloj-golden"
 	db_remote_state_key = "env:/stage/data-stores/mysql/terraform.tfstate"
